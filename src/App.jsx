@@ -20,64 +20,74 @@ import { Keyboard } from './components/Keyboard'
 const TARGET = 'peace'
 
 function App() {
-  const [gameState, setGameState] = useState({enteredWords: ['ddddd','ddddd','ddddd','ddddd', 'fffff', ], currentWord: ''}) // храню введеные слова
-  const [isTargetWord, setIsTargetWord] = useState(false)
+  const [gameState, setGameState] = useState({
+    enteredWords: ['eeeee', 'fffff'], 
+    currentWord: '', 
+    isTargetWord: false,
+  }) // храню введеные слова
+  
   const enteringWords = (l) => setGameState(prev => {
-      if(prev.currentWord.length < 5 && !isTargetWord) {
-        return {
-          ...prev, 
-          currentWord: prev.currentWord + l.toLowerCase(),
-        }
-      } 
+    if(!prev.isTargetWord && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
+      return {
+        ...prev, 
+        currentWord: prev.currentWord + l.toLowerCase(),
+      }
+    } 
     return prev
   })
 
-  const pushWord = () => setGameState(prev => {       
-    if (prev.currentWord.length === 5 && prev.enteredWords.length !== 6 && !isTargetWord) {        
-      if(prev.currentWord === TARGET) {
-        setIsTargetWord(true);
-      }      
+  const pushWord = () => setGameState(prev => {   
+    if (prev.isTargetWord || prev.enteredWords.length === 6) { // слово угадано или кончились попытки - сброс игры
       return {
-        ...prev, 
-        enteredWords: [...prev.enteredWords, prev.currentWord], 
+        enteredWords: [],
         currentWord: '',
-      }
-    } else if (prev.enteredWords.length === 6 || isTargetWord) {
-      setIsTargetWord(false)
+        isTargetWord: false,
+      };
+    }
+
+    if (prev.currentWord.length !== 5) return prev //обязательно 5 букв
+
+    if (prev.currentWord === TARGET) {// проверка на победу
+      console.log('bingo🎉🎉🎉🎉');
       return {
-        enteredWords: [], 
+        ...prev,
+        enteredWords: [...prev.enteredWords, prev.currentWord],
         currentWord: '',
-      }
-    }    
-    return prev
-  }) 
+        isTargetWord: true
+      };
+    }  
+   
+    return { // обычное добавление слова
+      ...prev,
+      enteredWords: [...prev.enteredWords, prev.currentWord],
+      currentWord: ''
+    };
+  });
 
   useEffect(()=>{
     console.log("Updated gameState:",gameState);
   },[gameState])
 
   const deleteLetter = () => setGameState(prev => {
-    if (!isTargetWord) {
+    if (!prev.isTargetWord ) {
       return {
       ...prev, 
       currentWord: prev.currentWord.slice(0, -1),
     } 
-    }    
+    }
   })   
  
   return <>
       <h1>Wordle</h1>
       <Board 
         targetWord={TARGET}
-        currentWord = {gameState.currentWord}
         enteredWords = {gameState.enteredWords} 
+        currentWord = {gameState.currentWord}
       />
       <Keyboard 
         deleteLetter = {deleteLetter} 
         pushWord = {pushWord} 
         enteringWords = {enteringWords} 
-        currentWord = {gameState.currentWord}
-        enteredWords = {gameState.enteredWords}
         />
   </> 
 }
