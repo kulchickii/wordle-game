@@ -5,15 +5,13 @@ import { Words } from './Words';
 
 const COUNT_ROWS = 6
 const COUNT_LETTERS = 5
-const TARGET = 'peace'
 
-export const Board = ({enteredWords, currentWord}) => {     
+export const Board = ({enteredWords, currentWord, targetWord}) => {     
   const remainingRows = COUNT_ROWS - enteredWords.length - 1   // оставшиеся кол-во строк
-  console.log(remainingRows);
   
   return <div className={styles.board}>
     {enteredWords.map((word, id) => 
-      <Words targetWord = {TARGET} word = {word} key = {id}/>
+      <Words targetWord = {targetWord} word = {word} key = {id}/>
     )}
     
     {remainingRows >= 0 && <CurrentWord currentWord = {currentWord} />}
