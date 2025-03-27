@@ -3,7 +3,7 @@ import styles from './Keyboard.module.css'
 
 const LETTERS = 'qwertyuiopasdfghjklzxcvbnm'
 
-export const Keyboard = ({deleteLetter, pushWord, enteringWords}) => {
+export const Keyboard = ({deleteLetter, pushWord, enteringWords, onKeyboardCheckLetters}) => {  
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase()      
@@ -23,11 +23,16 @@ export const Keyboard = ({deleteLetter, pushWord, enteringWords}) => {
   }, []);
 
   return <div className={styles.keyboard_module}>
-    {LETTERS.split('').map(el => 
-      <button key = {el} onClick={() => enteringWords(el)}>
+    {LETTERS.split('').map(el =>{ 
+      const check = onKeyboardCheckLetters.has(el)
+      return <button 
+        key = {el} 
+        onClick={() => enteringWords(el)}
+        className={`${check ? styles[onKeyboardCheckLetters.get(el)]: ''}`}
+      >
         {el.toUpperCase()}
       </button>  
-    )}
+    })}
     <button className={`${styles.backspace}`} onClick={() => deleteLetter()}>back</button>
     <button  className={`${styles.enter}`} onClick={() => pushWord()}>enter</button>
 

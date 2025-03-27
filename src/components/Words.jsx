@@ -1,5 +1,5 @@
 import { checkingLetter } from '../core/chekingLetter'; 
-import styles from './Word.module.css'
+import styles from './Words.module.css'
 
 export const Words = ({word, targetWord}) =>  
    word.split('').map((symbol, idx) => {

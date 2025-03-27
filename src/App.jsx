@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { Board } from './components/Board'
 import { Keyboard } from './components/Keyboard'
-
-// 1. Раскрашивать буквы в строках со словами
-// 2. Раскрашивать буквы на клавиатуре
+import {onKeyboardCheckLetters} from './core/onKeyboardCheckLetters '
+// 1. Раскрашивать буквы в строках со словами + 
+// 2. Раскрашивать буквы на клавиатуре + 
 // 3. При окончании игры выводить сообщение над рядами с буквами если проиграл, то говорить, какое слово было загадано
 // 4. Предлагать после окончания игры играть заново с новым словом
 // 5. Найти список английских слов и использовать для
@@ -21,10 +21,10 @@ const TARGET = 'peace'
 
 function App() {
   const [gameState, setGameState] = useState({
-    enteredWords: ['eeeee', 'fffff'], 
+    enteredWords: [], 
     currentWord: '', 
     isTargetWord: false,
-  }) // храню введеные слова
+  }) 
   
   const enteringWords = (l) => setGameState(prev => {
     if(!prev.isTargetWord && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
@@ -64,10 +64,6 @@ function App() {
     };
   });
 
-  useEffect(()=>{
-    console.log("Updated gameState:",gameState);
-  },[gameState])
-
   const deleteLetter = () => setGameState(prev => {
     if (!prev.isTargetWord ) {
       return {
@@ -76,7 +72,7 @@ function App() {
     } 
     }
   })   
- 
+
   return <>
       <h1>Wordle</h1>
       <Board 
@@ -88,7 +84,8 @@ function App() {
         deleteLetter = {deleteLetter} 
         pushWord = {pushWord} 
         enteringWords = {enteringWords} 
-        />
+        onKeyboardCheckLetters = {onKeyboardCheckLetters(gameState.enteredWords, TARGET)}
+      />
   </> 
 }
 
