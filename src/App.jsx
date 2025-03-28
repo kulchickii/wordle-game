@@ -3,14 +3,16 @@ import './App.css'
 import { Board } from './components/Board'
 import { Keyboard } from './components/Keyboard'
 import {onKeyboardCheckLetters} from './core/onKeyboardCheckLetters '
+import { ResultGame } from './components/ResultGame'
 // 1. Раскрашивать буквы в строках со словами + 
 // 2. Раскрашивать буквы на клавиатуре + 
+
 // 3. При окончании игры выводить сообщение над рядами с буквами если проиграл, то говорить, какое слово было загадано
 // 4. Предлагать после окончания игры играть заново с новым словом
 // 5. Найти список английских слов и использовать для
-// 5а. генерации нового загаданного слова
-// 56. проверки, что слово существует, когда вы пытаетесь его ввести
-// 5в* можно вытащить этот список из исходников оригинальной игры
+//    5а. генерации нового загаданного слова
+//    56. проверки, что слово существует, когда вы пытаетесь его ввести
+//    5в* можно вытащить этот список из исходников оригинальной игры
 // 6. Написать тесты хотя бы на раскраску букв
 // Потестировать колбэки компонента клавиатуры
 // 7* Сохранение состояния игры в локал сторадж
@@ -23,39 +25,39 @@ function App() {
   const [gameState, setGameState] = useState({
     enteredWords: [], 
     currentWord: '', 
-    isTargetWord: false,
+    isGameStop: false,
+    isWin: false
   }) 
   
   const enteringWords = (l) => setGameState(prev => {
-    if(!prev.isTargetWord && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
-      return {
-        ...prev, 
-        currentWord: prev.currentWord + l.toLowerCase(),
-      }
+    if(!prev.isGameStop && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
+      return {...prev, currentWord: prev.currentWord + l.toLowerCase(),}
     } 
     return prev
   })
 
-  const pushWord = () => setGameState(prev => {   
-    if (prev.isTargetWord || prev.enteredWords.length === 6) { // слово угадано или кончились попытки - сброс игры
-      return {
-        enteredWords: [],
-        currentWord: '',
-        isTargetWord: false,
-      };
-    }
-
-    if (prev.currentWord.length !== 5) return prev //обязательно 5 букв
+  const pushWord = () => setGameState(prev => {     
+    if (prev.isGameStop || prev.currentWord.length !== 5) return prev     
 
     if (prev.currentWord === TARGET) {// проверка на победу
-      console.log('bingo🎉🎉🎉🎉');
       return {
         ...prev,
         enteredWords: [...prev.enteredWords, prev.currentWord],
         currentWord: '',
-        isTargetWord: true
+        isGameStop: true,
+        isWin: true,
+      }    
+    }        
+      
+    if (prev.enteredWords.length + 1 === 6) { // условие окончание игры
+      return { 
+        ...prev, 
+        enteredWords: [...prev.enteredWords, prev.currentWord], 
+        currentWord: '',
+        isGameStop: true, 
+        isWin: false 
       };
-    }  
+    }
    
     return { // обычное добавление слова
       ...prev,
@@ -64,17 +66,30 @@ function App() {
     };
   });
 
-  const deleteLetter = () => setGameState(prev => {
-    if (!prev.isTargetWord ) {
+  const deleteLetter = () => setGameState(prev => { 
+    if (prev.isGameStop) return prev
+
       return {
       ...prev, 
       currentWord: prev.currentWord.slice(0, -1),
     } 
-    }
+    
   })   
 
-  return <>
-      <h1>Wordle</h1>
+  const resetGame = () => setGameState(() => ({
+    enteredWords: [], 
+    currentWord: '', 
+    isGameStop: false,
+    isWin: false
+  }))
+
+
+  return <> 
+      <div className='headers-container'>
+        <h1>Wordle</h1>
+        {gameState.isGameStop &&<ResultGame isWin = {gameState.isWin} targetWord={TARGET} resetGame={resetGame}/>}
+      </div>    
+
       <Board 
         targetWord={TARGET}
         enteredWords = {gameState.enteredWords} 
@@ -90,14 +105,6 @@ function App() {
 }
 
 export default App
-
-
-/* 
-1. Приложение падает при вводе Enter на последнем слове (enter => слово добавляется/проверяется (последнее) => enter =>игра заново начинается)
-2. Добавить проверку на выйгрыш слова
-3. Логику обработки нажатия вынести в отдельный файл
-4. добавить отображение клавиш(букв которые ввели)
-*/
 
 
 /* 
