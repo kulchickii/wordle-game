@@ -7,11 +7,3 @@ export const Words = ({word, targetWord}) =>
       {symbol}
     </div>
   })
-
-  // виртуальная клавиатура
-  // window обработчик
-
-/*  
- present (есть такая буква)
-  absent (нет такой буквы)
-  correct (буква на том месте) */

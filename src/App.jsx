@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { Board } from './components/Board'
 import { Keyboard } from './components/Keyboard'
 import {onKeyboardCheckLetters} from './core/onKeyboardCheckLetters '
 import { ResultGame } from './components/ResultGame'
+import {randomNum} from './core/randomNum'
+import wordsCollections from './data/wordsCollections.json'
+
 // 1. Раскрашивать буквы в строках со словами + 
 // 2. Раскрашивать буквы на клавиатуре + 
+// 3. При окончании игры выводить сообщение над рядами с буквами если проиграл, то говорить, какое слово было загадано +
 
-// 3. При окончании игры выводить сообщение над рядами с буквами если проиграл, то говорить, какое слово было загадано
 // 4. Предлагать после окончания игры играть заново с новым словом
 // 5. Найти список английских слов и использовать для
 //    5а. генерации нового загаданного слова
@@ -19,15 +22,24 @@ import { ResultGame } from './components/ResultGame'
 
 // узнать про события мыши
 
-const TARGET = 'peace'
 
 function App() {
+  const [targetWord, setTargetWord] = useState('') //объеденить в один стейт, не получается по другому!
   const [gameState, setGameState] = useState({
     enteredWords: [], 
     currentWord: '', 
     isGameStop: false,
     isWin: false
   }) 
+  
+  
+  useEffect(()=>{
+    setTargetWord(wordsCollections.words[randomNum(wordsCollections.words.length)])
+  }, [])
+console.log(targetWord);
+  useEffect(()=>{
+    console.log(gameState)
+  }, [gameState])
   
   const enteringWords = (l) => setGameState(prev => {
     if(!prev.isGameStop && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
@@ -36,10 +48,13 @@ function App() {
     return prev
   })
 
-  const pushWord = () => setGameState(prev => {     
+  const pushWord = () => setGameState(prev => {
     if (prev.isGameStop || prev.currentWord.length !== 5) return prev     
+      console.log('🎉🎉🎉🎉🎉', "1-",prev.currentWord, "2-", targetWord, prev.currentWord === targetWord );
 
-    if (prev.currentWord === TARGET) {// проверка на победу
+    if (prev.currentWord === targetWord) {// проверка на победу
+      
+      
       return {
         ...prev,
         enteredWords: [...prev.enteredWords, prev.currentWord],
@@ -68,7 +83,6 @@ function App() {
 
   const deleteLetter = () => setGameState(prev => { 
     if (prev.isGameStop) return prev
-
       return {
       ...prev, 
       currentWord: prev.currentWord.slice(0, -1),
@@ -76,22 +90,25 @@ function App() {
     
   })   
 
-  const resetGame = () => setGameState(() => ({
-    enteredWords: [], 
-    currentWord: '', 
-    isGameStop: false,
-    isWin: false
-  }))
+  const resetGame = () => {
+    setTargetWord(wordsCollections.words[randomNum(wordsCollections.words.length)])
+    setGameState(() => ({
+        enteredWords: [], 
+        currentWord: '', 
+        isGameStop: false,
+        isWin: false
+    })      
+)}
 
 
   return <> 
       <div className='headers-container'>
         <h1>Wordle</h1>
-        {gameState.isGameStop &&<ResultGame isWin = {gameState.isWin} targetWord={TARGET} resetGame={resetGame}/>}
+        {gameState.isGameStop &&<ResultGame isWin = {gameState.isWin} targetWord={targetWord} resetGame={resetGame}/>}
       </div>    
 
       <Board 
-        targetWord={TARGET}
+        targetWord={targetWord}
         enteredWords = {gameState.enteredWords} 
         currentWord = {gameState.currentWord}
       />
@@ -99,7 +116,7 @@ function App() {
         deleteLetter = {deleteLetter} 
         pushWord = {pushWord} 
         enteringWords = {enteringWords} 
-        onKeyboardCheckLetters = {onKeyboardCheckLetters(gameState.enteredWords, TARGET)}
+        onKeyboardCheckLetters = {onKeyboardCheckLetters(gameState.enteredWords, targetWord)}
       />
   </> 
 }
