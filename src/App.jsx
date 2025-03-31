@@ -10,36 +10,54 @@ import wordsCollections from './data/wordsCollections.json'
 // 1. Раскрашивать буквы в строках со словами + 
 // 2. Раскрашивать буквы на клавиатуре + 
 // 3. При окончании игры выводить сообщение над рядами с буквами если проиграл, то говорить, какое слово было загадано +
-
-// 4. Предлагать после окончания игры играть заново с новым словом
-// 5. Найти список английских слов и использовать для
-//    5а. генерации нового загаданного слова
-//    56. проверки, что слово существует, когда вы пытаетесь его ввести
+// 4. Предлагать после окончания игры играть заново с новым словом +
+// 5. Найти список английских слов и использовать для +
+//    5а. генерации нового загаданного слова +
+//    56. проверки, что слово существует, когда вы пытаетесь его ввести +
 //    5в* можно вытащить этот список из исходников оригинальной игры
+// 7* Сохранение состояния игры в локал сторадж + 
+
 // 6. Написать тесты хотя бы на раскраску букв
 // Потестировать колбэки компонента клавиатуры
-// 7* Сохранение состояния игры в локал сторадж
 
 // узнать про события мыши
 
-
 function App() {
+  const isSaveLocalStorage = () => {
+    if(localStorage.getItem("gameState")) {
+      return JSON.parse(localStorage.getItem("gameState"))
+    } else {
+      return {
+      enteredWords: [], 
+      currentWord: '', 
+      targetWord: '',
+      isGameStop: false,
+      isWin: false,    
+      }
+    }     
+  }
+
   const [isShowAlert, setIsShowAlert] = useState(false)
-  const [gameState, setGameState] = useState({
-    enteredWords: [], 
-    currentWord: '', 
-    targetWord: '',
-    isGameStop: false,
-    isWin: false,    
-  }) 
-    console.log(gameState.targetWord);
-    
-  useEffect(()=>{
-    setGameState(prev =>({
+  const [gameState, setGameState] = useState(isSaveLocalStorage) 
+
+  console.log(gameState.targetWord);
+
+  useEffect(() => {
+    if (gameState.targetWord) {
+      localStorage.setItem("gameState", JSON.stringify(gameState))
+    }
+  }, [gameState])
+
+  useEffect(() => {
+    if (!gameState.targetWord) {
+      setGameState((prev) => ({
         ...prev,
-        targetWord: wordsCollections.words[randomNum(wordsCollections.words.length)]
-      })
-  )}, [])
+        targetWord: wordsCollections.words[randomNum(wordsCollections.words.length)],
+      }))
+    }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
 
   const enteringWords = (l) => setGameState(prev => {
     if(!prev.isGameStop && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
@@ -49,9 +67,9 @@ function App() {
   })
 
    const pushWord = () => setGameState(prev => {
-    if (prev.isGameStop || prev.currentWord.length !== 5) return prev    
+    if (prev.isGameStop || prev.currentWord.length !== 5) return prev  // игра остановлена и много слов введено
 
-    if (prev.currentWord === prev.targetWord) {// проверка на победу
+    if (prev.currentWord === prev.targetWord) {// условие победы
       return {
         ...prev,
         enteredWords: [...prev.enteredWords, prev.currentWord],
@@ -61,7 +79,7 @@ function App() {
       }    
     }        
       
-    if (prev.enteredWords.length + 1 === 6) { // условие окончание игры
+    if (prev.enteredWords.length + 1 === 6) { // конец игры
       return { 
         ...prev, 
         enteredWords: [...prev.enteredWords, prev.currentWord], 
@@ -71,8 +89,7 @@ function App() {
       };
     } 
     
-    const handleMissingWord = prev => { //обработка отсутсвующего слова
-      console.log('нет такого слова')    
+    const handleMissingWord = prev => { // нет слова в словаре
       setIsShowAlert(true)    
       setTimeout(() => setIsShowAlert(false), 1000)
       return prev
@@ -88,7 +105,7 @@ function App() {
       
   });
 
-  const deleteLetter = () => setGameState(prev => { 
+  const deleteLetter = () => setGameState(prev => { // удаление буквы
     if (prev.isGameStop) return prev
 
     return {
@@ -98,7 +115,7 @@ function App() {
     
   })   
 
-  const resetGame = () => {
+  const resetGame = () => { //сброс игры
     setGameState(() => ({
         enteredWords: [], 
         currentWord: '', 
@@ -107,7 +124,6 @@ function App() {
         isWin: false
     })      
 )}
-
 
   return <> 
       <div className='headers-container'>
