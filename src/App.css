@@ -55,3 +55,28 @@ h1 {
 h2 {
   margin: 0 auto;
 }
+
+.notification {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background-color: #ffffff;
+  padding: 18px 24px;
+  border-radius: 4px;
+  font-weight: bold;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  color: black;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: 
+    transform 300ms cubic-bezier(0.17, 0.04, 0.03, 0.94),
+    opacity 300ms ease;
+  z-index: 1000;
+  pointer-events: none; 
+}
+
+.notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

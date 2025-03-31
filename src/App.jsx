@@ -24,23 +24,23 @@ import wordsCollections from './data/wordsCollections.json'
 
 
 function App() {
-  const [targetWord, setTargetWord] = useState('') //объеденить в один стейт, не получается по другому!
+  const [isShowAlert, setIsShowAlert] = useState(false)
   const [gameState, setGameState] = useState({
     enteredWords: [], 
     currentWord: '', 
+    targetWord: '',
     isGameStop: false,
-    isWin: false
+    isWin: false,    
   }) 
-  
-  
+    console.log(gameState.targetWord);
+    
   useEffect(()=>{
-    setTargetWord(wordsCollections.words[randomNum(wordsCollections.words.length)])
-  }, [])
-console.log(targetWord);
-  useEffect(()=>{
-    console.log(gameState)
-  }, [gameState])
-  
+    setGameState(prev =>({
+        ...prev,
+        targetWord: wordsCollections.words[randomNum(wordsCollections.words.length)]
+      })
+  )}, [])
+
   const enteringWords = (l) => setGameState(prev => {
     if(!prev.isGameStop && prev.currentWord.length < 5 && prev.enteredWords.length < 6) {
       return {...prev, currentWord: prev.currentWord + l.toLowerCase(),}
@@ -48,13 +48,10 @@ console.log(targetWord);
     return prev
   })
 
-  const pushWord = () => setGameState(prev => {
-    if (prev.isGameStop || prev.currentWord.length !== 5) return prev     
-      console.log('🎉🎉🎉🎉🎉', "1-",prev.currentWord, "2-", targetWord, prev.currentWord === targetWord );
+   const pushWord = () => setGameState(prev => {
+    if (prev.isGameStop || prev.currentWord.length !== 5) return prev    
 
-    if (prev.currentWord === targetWord) {// проверка на победу
-      
-      
+    if (prev.currentWord === prev.targetWord) {// проверка на победу
       return {
         ...prev,
         enteredWords: [...prev.enteredWords, prev.currentWord],
@@ -72,18 +69,29 @@ console.log(targetWord);
         isGameStop: true, 
         isWin: false 
       };
+    } 
+    
+    const handleMissingWord = prev => { //обработка отсутсвующего слова
+      console.log('нет такого слова')    
+      setIsShowAlert(true)    
+      setTimeout(() => setIsShowAlert(false), 1000)
+      return prev
     }
-   
-    return { // обычное добавление слова
-      ...prev,
-      enteredWords: [...prev.enteredWords, prev.currentWord],
-      currentWord: ''
-    };
+
+    return wordsCollections.words.includes(prev.currentWord) ? 
+      { // обычное добавление слова
+        ...prev,
+        enteredWords: [...prev.enteredWords, prev.currentWord],
+        currentWord: ''
+      }: 
+      handleMissingWord(prev)//'нет такого слова'
+      
   });
 
   const deleteLetter = () => setGameState(prev => { 
     if (prev.isGameStop) return prev
-      return {
+
+    return {
       ...prev, 
       currentWord: prev.currentWord.slice(0, -1),
     } 
@@ -91,10 +99,10 @@ console.log(targetWord);
   })   
 
   const resetGame = () => {
-    setTargetWord(wordsCollections.words[randomNum(wordsCollections.words.length)])
     setGameState(() => ({
         enteredWords: [], 
         currentWord: '', 
+        targetWord: wordsCollections.words[randomNum(wordsCollections.words.length)],
         isGameStop: false,
         isWin: false
     })      
@@ -104,19 +112,22 @@ console.log(targetWord);
   return <> 
       <div className='headers-container'>
         <h1>Wordle</h1>
-        {gameState.isGameStop &&<ResultGame isWin = {gameState.isWin} targetWord={targetWord} resetGame={resetGame}/>}
+        {gameState.isGameStop &&<ResultGame isWin = {gameState.isWin} targetWord={gameState.targetWord} resetGame={resetGame}/>}
       </div>    
 
+      <div className={`notification ${isShowAlert ? 'show' : ''}`} >not in word list</div>
+      
       <Board 
-        targetWord={targetWord}
+        targetWord={gameState.targetWord}
         enteredWords = {gameState.enteredWords} 
         currentWord = {gameState.currentWord}
+        isShowAlert = {isShowAlert}
       />
       <Keyboard 
         deleteLetter = {deleteLetter} 
         pushWord = {pushWord} 
         enteringWords = {enteringWords} 
-        onKeyboardCheckLetters = {onKeyboardCheckLetters(gameState.enteredWords, targetWord)}
+        onKeyboardCheckLetters = {onKeyboardCheckLetters(gameState.enteredWords, gameState.targetWord)}
       />
   </> 
 }
