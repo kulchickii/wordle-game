@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { Board } from './components/Board'
 import { Keyboard } from './components/Keyboard'
-import {onKeyboardCheckLetters} from './core/onKeyboardCheckLetters '
+import {onKeyboardCheckLetters} from './core/onKeyboardCheckLetters'
 import { ResultGame } from './components/ResultGame'
 import {randomNum} from './core/randomNum'
 import wordsCollections from './data/wordsCollections.json'
@@ -16,8 +16,8 @@ import wordsCollections from './data/wordsCollections.json'
 //    56. проверки, что слово существует, когда вы пытаетесь его ввести +
 //    5в* можно вытащить этот список из исходников оригинальной игры
 // 7* Сохранение состояния игры в локал сторадж + 
-
 // 6. Написать тесты хотя бы на раскраску букв
+
 // Потестировать колбэки компонента клавиатуры
 
 // узнать про события мыши
@@ -28,12 +28,12 @@ function App() {
       return JSON.parse(localStorage.getItem("gameState"))
     } else {
       return {
-      enteredWords: [], 
-      currentWord: '', 
-      targetWord: '',
-      isGameStop: false,
-      isWin: false,    
-      }
+        enteredWords: [], 
+        currentWord: '', 
+        targetWord: '',
+        isGameStop: false,
+        isWin: false,    
+        }
     }     
   }
 
@@ -54,8 +54,7 @@ function App() {
         ...prev,
         targetWord: wordsCollections.words[randomNum(wordsCollections.words.length)],
       }))
-    }
-     // eslint-disable-next-line react-hooks/exhaustive-deps
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
@@ -88,8 +87,8 @@ function App() {
         isWin: false 
       };
     } 
-    
-    const handleMissingWord = prev => { // нет слова в словаре
+      
+    const handleMissingWord = (prev) => { // нет слова в словаре
       setIsShowAlert(true)    
       setTimeout(() => setIsShowAlert(false), 1000)
       return prev
@@ -100,9 +99,7 @@ function App() {
         ...prev,
         enteredWords: [...prev.enteredWords, prev.currentWord],
         currentWord: ''
-      }: 
-      handleMissingWord(prev)//'нет такого слова'
-      
+      } : handleMissingWord(prev)    
   });
 
   const deleteLetter = () => setGameState(prev => { // удаление буквы
@@ -155,5 +152,6 @@ export default App
 git add .
 git commit -m "описание изменений"
 git push origin main 
+
 */
 //checking

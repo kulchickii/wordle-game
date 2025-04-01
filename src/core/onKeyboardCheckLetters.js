@@ -1,6 +1,7 @@
 import { checkingLetter } from "./chekingLetter"
 
 export const onKeyboardCheckLetters = (enteredWords, target) => {
+  
   const collectionOfStatuses = new Map()
 
   for(let i = 0; i < enteredWords.length; i++) {
