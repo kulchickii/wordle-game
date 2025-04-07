@@ -17,3 +17,4 @@ export const onKeyboardCheckLetters = (enteredWords, target) => {
   return collectionOfStatuses
 }
 
+//переделать функцию !!!!!!!!!!
