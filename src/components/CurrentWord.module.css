@@ -12,7 +12,7 @@
   transition: transform 0.1s ease;
 }
 
-/* Анимация тряски */
+/* анимация тряски */
 .shake {
   animation: shake 0.5s cubic-bezier(.36,.07,.19,.97);
 }

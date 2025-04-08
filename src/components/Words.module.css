@@ -11,7 +11,7 @@
 }
 
 .absent {
-  border: 2px solid #949292; /* Серый цвет для отсутствующих букв */
+  border: 2px solid #949292; 
 }
 
 .present {
@@ -21,12 +21,3 @@
 .correct {
   border: 2px solid #0df324;
 }
-
-/* 
-target - 'peace'
-
-present (есть такая буква)
-absent (нет такой буквы) 
-correct (буква на том месте) 
-
-*/
