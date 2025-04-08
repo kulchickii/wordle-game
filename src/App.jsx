@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import wordsCollections from './data/wordsCollections.json'
 import { Board } from './components/Board'
 import { Keyboard } from './components/Keyboard'
 import { onKeyboardCheckLetters } from './core/onKeyboardCheckLetters'
 import { ResultGame } from './components/ResultGame'
-import {getRandomWord} from './core/getRandomWord'
-import wordsCollections from './data/wordsCollections.json'
+import { getInitialState } from './core/getInitialState'
+import { loadGameState } from './core/loadGameState'
 import {cls} from './core/cls'
 
 
@@ -20,25 +21,14 @@ import {cls} from './core/cls'
 // 7* Сохранение состояния игры в локал сторадж + 
 // 6. Написать тесты хотя бы на раскраску букв +
 
-// Потестировать колбэки компонента клавиатуры (нужна помошь)
+//проверить приложение полностью, функции вынести за пределы приложения+
+//переделать функцию раскраски (принимать должна слово, а не букву)+
 
 
-//переделать функцию раскраски (принимать должна слово, а не букву)
-//проверить приложение полностью, функции вынести за пределы приложения
+// Потестировать колбэки компонента клавиатуры 
 // как все бужет готово,  написать тесты на компонент клавиатуры и проверить как работает клавиатура и колбэки
+//переписать клавиатуру, чтобы нормально выглядела
 
-const getInitialState = () => ({
-  enteredWords: [],
-  currentWord: '',
-  targetWord: getRandomWord()
-});
-
-const loadGameState = () => {
-  if (localStorage.getItem("gameState") !== null) {
-    return JSON.parse(localStorage.getItem("gameState"))
-  }
-  return getInitialState()
-}
 //-----------------------------------------------------------------------------------------------------
 
 function App() {
@@ -52,16 +42,17 @@ function App() {
     localStorage.setItem("gameState", JSON.stringify(gameState))
   }, [gameState])
 
-  const enteringWords = (l) => setGameState(prev => { // добавляет букву    
+  const handleLetterInput = (l) => setGameState(prev => { // добавляет букву    
     if (prev.currentWord.length < 5 
         && prev.enteredWords.length < 6 
-        && !prev.enteredWords.includes(prev.targetWord) ) {
+        && !prev.enteredWords.includes(prev.targetWord)//на выйгрыш проверяю в момоенте
+      ) {
       return { ...prev, currentWord: prev.currentWord + l.toLowerCase(), }
     }
     return prev
   })
 
-  const pushWord = () => setGameState(prev => { //добавляет слово
+  const handleSubmitWord = () => setGameState(prev => { //добавляет слово
     if (prev.currentWord.length !== 5) return prev
 
     if (!wordsCollections.words.includes(prev.currentWord)) {
@@ -77,7 +68,7 @@ function App() {
     }
   });
 
-  const deleteLetter = () => setGameState(prev => { // удаление буквы
+  const handleBackspace = () => setGameState(prev => { // удаление буквы
     if (prev.currentWord.length <= 0 ) return prev 
     return {
       ...prev,
@@ -88,7 +79,13 @@ function App() {
   return <>
     <div className='headers-container'>
       <h1>Wordle</h1>
-      <ResultGame isGameStop={isGameStop} isWin={isWin} targetWord={gameState.targetWord} resetGame={()=>setGameState(getInitialState())} />
+
+      <ResultGame 
+        isGameStop={isGameStop} 
+        isWin={isWin} 
+        targetWord={gameState.targetWord} 
+        resetGame={()=>setGameState(getInitialState())} 
+      />
     </div>
 
     <div className={cls("notification", isShowAlert && "show")} >not in word list</div>
@@ -101,9 +98,9 @@ function App() {
     />
     <Keyboard
       disabled={isGameStop}
-      deleteLetter={deleteLetter}
-      pushWord={pushWord}
-      enteringWords={enteringWords}
+      handleBackspace={handleBackspace}
+      handleSubmitWord={handleSubmitWord}
+      handleLetterInput={handleLetterInput}
       onKeyboardCheckLetters={onKeyboardCheckLetters(gameState.enteredWords, gameState.targetWord)}
     />
   </>

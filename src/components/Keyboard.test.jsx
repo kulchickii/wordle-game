@@ -1,77 +1,138 @@
-import { expect, afterEach, describe, test, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { expect, describe, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { Keyboard } from "./Keyboard";
 
+expect.extend(matchers);
+
 describe("компонент Keyboard", () => {
-  test('что-то проверяем', () => {
-    const foo = vi.fn();
-
-    // foo(1)
-    // foo(2)
-
+//====================
+  it('Клавиатура рисует 26 + 2 = 28 кнопок', () => {
     render(
-      <Keyboard
+      <Keyboard 
+        disabled={false} 
+        handleBackspace={() => {}} 
+        handleSubmitWord={() => {}} 
+        handleLetterInput={() => {}} 
+        onKeyboardCheckLetters={{}} 
+     />);
+    const buttons = screen.queryAllByRole("button")
+    expect(buttons).toHaveLength(28)
+  });
+//====================
+  it('рисуются нужные буквы от q до m', () => {
+    render(
+      <Keyboard 
         disabled={false}
-        deleteLetter={foo}
-        pushWord={() => { }}
-        enteringWords={() => { }}
-        onKeyboardCheckLetters={new Map()}
-      />
-    );
+        handleBackspace={() => {}}
+        handleSubmitWord={() => {}}
+        handleLetterInput={() => {}}
+        onKeyboardCheckLetters={{}}
+      />)
 
-
-    // <Keyboard
-    //   disabled={false}
-    //   onLetterPress={(letter) => {}}
-    //   onEnterPress={() => { }}
-    //   onBackspacePress={() => { }}
-    //   letter2status={new Map()}
-    // />
-
-    // в компоненте Keyboard добавить testid, чтобы потом найти нужную кнопку
-    // клик по кеопку delete
-
-    expect(foo).toHaveBeenCalledTimes(1)
-
+    for (const letter of 'qwertyuiopasdfghjklzxcvbnm') {
+      // console.log('>>',letter);
+      const upLetter = letter.toUpperCase()
+      const element = screen.getByText(upLetter)   
+      expect(element).toBeTruthy()// если есть элемент, то все ок, остальное err
+    }
   });
+//====================
+  it('вызов handleLetterInput при клике по букве', async () => {
+    const handleLetterInput = vi.fn()
 
-  //напиши тесты на компоеннты, переделай функции на проверку слов чтобы отрисовывались 🧲🧲🧲🧲🧲🧲🧲🧲🧲🧲🧲🧲🧲🧲🧲
-
-  test('Клавиатура рисует 26 + 2 = 28 кнопок', () => {
     render(
-      <Keyboard disabled={false}
-        deleteLetter={() => { }}
-        pushWord={() => { }}
-        enteringWords={() => { }}
-        onKeyboardCheckLetters={new Map()}
+      <Keyboard 
+        disabled={false}
+        handleBackspace={() => {}}
+        handleSubmitWord={() => {}}
+        handleLetterInput={handleLetterInput}
+        onKeyboardCheckLetters={{}}
+      />)
+
+    const btnR = screen.getByText('R')
+    await userEvent.click(btnR)
+    expect(handleLetterInput).toHaveBeenCalledWith('r')
+
+    const btnD = screen.getByText('D')
+    await userEvent.click(btnD)
+    expect(handleLetterInput).toHaveBeenCalledWith('d') //вызов функции c нужным аргументом
+  })
+//====================
+  it('ввод клавиш с клавиатуры (keyDown)', () => {
+    const handleLetterInput = vi.fn()
+    const handleBackspace = vi.fn()
+    const handleSubmitWord = vi.fn()
+
+    render(
+      <Keyboard 
+        disabled={false}
+        handleBackspace={handleBackspace}
+        handleSubmitWord={handleSubmitWord}
+        handleLetterInput={handleLetterInput}
+        onKeyboardCheckLetters={{}}
       />
     );
 
-    // https://testing-library.com/docs/queries/about/
-    const buttons = screen.queryAllByRole("button");
-    expect(buttons).toHaveLength(28);
-    // console.log(buttons);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }))
+    expect(handleLetterInput).toHaveBeenCalledWith('r')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }))
+    expect(handleSubmitWord).toHaveBeenCalled()
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }))
+    expect(handleBackspace).toHaveBeenCalled()
+  })
+//====================
+  it('вызывает handleBackspace при клике по кнопке back', async () => {
+    const handleBackspace = vi.fn()
+    render(
+      <Keyboard 
+        disabled={false}
+        handleBackspace={handleBackspace}
+        handleSubmitWord={() => {}}
+        handleLetterInput={() => {}}
+        onKeyboardCheckLetters={{}}
+      />)
+    const btn = screen.getByText('back')
+    await userEvent.click(btn)
+    expect(handleBackspace).toHaveBeenCalled()
   });
 
+ //====================
+  it('вызывает handleSubmitWord при клике по enter', async () => {
+    const handleSubmitWord = vi.fn()
+    render(
+      <Keyboard 
+        disabled={false}
+        handleBackspace={() => {}}
+        handleSubmitWord={handleSubmitWord}
+        handleLetterInput={() => {}}
+        onKeyboardCheckLetters={{}}
+      />)
+
+    const btn = screen.getByText('enter')
+    await userEvent.click(btn)
+    expect(handleSubmitWord).toHaveBeenCalled()
+  });
+ //====================
+  it('все кнопки disabled, если передан пропс disabled=true', () => {
+    render(
+      <Keyboard 
+        disabled={true}
+        handleBackspace={() => {}}
+        handleSubmitWord={() => {}}
+        handleLetterInput={() => {}}
+        onKeyboardCheckLetters={{}}
+      />
+    )
+
+    const buttons = screen.getAllByRole('button')
+    for(const btn of buttons) {        
+       expect(btn).toBeDisabled()
+    }
+  })
 
 });
 
-
-/* 
-import { render, screen } from '@testing-library/react';
-
-import App from './App';
-
-describe('App', () => {
-  it('renders headline', () => {
-    render(<App title="React" />);
-
-    screen.debug();
-
-    // check if App components renders headline
-  });
-});
-
-
-*/

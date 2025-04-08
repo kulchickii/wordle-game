@@ -3,40 +3,40 @@ import styles from './Keyboard.module.css'
 
 const LETTERS = 'qwertyuiopasdfghjklzxcvbnm'
 
-export const Keyboard = ({ deleteLetter, pushWord, enteringWords, onKeyboardCheckLetters, disabled }) => {
+export const Keyboard = ({ handleBackspace, handleSubmitWord, handleLetterInput, onKeyboardCheckLetters, disabled }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase()
       if (LETTERS.includes(key)) {
-        enteringWords(key)
+        handleLetterInput(key)
       }
       else if (key === 'enter') {
-        pushWord()
+        handleSubmitWord()
       }
       else if (key === 'backspace') {
-        deleteLetter()
+        handleBackspace()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-//Доделать клавиатуру
+  
   return (
     <div className={styles.keyboard_module}>
       {LETTERS.split('').map(el => {
-        const check = onKeyboardCheckLetters.has(el)
+        const check = Object.hasOwn(onKeyboardCheckLetters, el) 
         return <button
           disabled={disabled}
           key={el}
-          onClick={() => enteringWords(el)}
-          className={`${check ? styles[onKeyboardCheckLetters.get(el)] : ''}`}
+          onClick={() => handleLetterInput(el)}
+          className={`${check ? styles[onKeyboardCheckLetters[el]] : ''}`}
         >
           {el.toUpperCase()}
         </button>
       })}
-      <button disabled={disabled} className={`${styles.backspace}`} onClick={() => deleteLetter()}>back</button>
-      <button disabled={disabled} className={`${styles.enter}`} onClick={() => pushWord()}>enter</button>
+      <button disabled={disabled} className={`${styles.backspace}`} onClick={() => handleBackspace()}>back</button>
+      <button disabled={disabled} className={`${styles.enter}`} onClick={() => handleSubmitWord()}>enter</button>
     </div>
   );
 }
