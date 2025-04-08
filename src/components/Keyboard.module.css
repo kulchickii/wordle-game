@@ -1,20 +1,21 @@
-/* 490 *200 */
-.keyboard_module {
-  width: 490px;
-  height: 200px;
+.keyboard {
+  display: flex;
+  flex-direction: column;
   margin-top: 20px;
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 5px;
-  justify-content: center;
   align-items: center;
 }
 
-.keyboard_module button {
-  width: 100%;
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+.key {
   height: 58px;
+  min-width: 35px;
   font-size: 18px;
   font-weight: bold;
+  margin: 4px;
   text-transform: uppercase;
   border-radius: 5px;
   cursor: pointer;
@@ -22,7 +23,6 @@
 }
 
 .backspace {
-  width: 43px;
   grid-column: span 2;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .absent {
-  border: 2px solid #949292; /* Серый цвет для отсутствующих букв */
+  border: 2px solid #949292; 
 }
 
 .present {
