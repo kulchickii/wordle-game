@@ -60,7 +60,7 @@ describe("компонент Keyboard", () => {
     expect(handleLetterInput).toHaveBeenCalledWith('d') //вызов функции c нужным аргументом
   })
 //====================
-  it('ввод клавиш с клавиатуры (keyDown)', () => {
+  it('ввод клавиш с клавиатуры', () => {
     const handleLetterInput = vi.fn()
     const handleBackspace = vi.fn()
     const handleSubmitWord = vi.fn()
@@ -95,10 +95,10 @@ describe("компонент Keyboard", () => {
         handleLetterInput={() => {}}
         onKeyboardCheckLetters={{}}
       />)
-    const btn = screen.getByText('back')
+    const btn = screen.getByTestId('el-backspace')
     await userEvent.click(btn)
-    expect(handleBackspace).toHaveBeenCalled()
-  });
+    expect(handleBackspace).toHaveBeenCalled("el-backspace")   
+  })
 
  //====================
   it('вызывает handleSubmitWord при клике по enter', async () => {
@@ -112,26 +112,35 @@ describe("компонент Keyboard", () => {
         onKeyboardCheckLetters={{}}
       />)
 
-    const btn = screen.getByText('enter')
+    const btn = screen.getByTestId('el-enter')
     await userEvent.click(btn)
-    expect(handleSubmitWord).toHaveBeenCalled()
+    expect(handleSubmitWord).toHaveBeenCalled('el-enter')
   });
  //====================
-  it('все кнопки disabled, если передан пропс disabled=true', () => {
+  it('если disabled => то функции вызываются )', () => {
+    const handleBackspace = vi.fn();
+    const handleSubmitWord = vi.fn();
+    const handleLetterInput = vi.fn();
+    
     render(
       <Keyboard 
         disabled={true}
-        handleBackspace={() => {}}
-        handleSubmitWord={() => {}}
-        handleLetterInput={() => {}}
-        onKeyboardCheckLetters={{}}
+        handleBackspace={handleBackspace}
+        handleSubmitWord={handleSubmitWord}
+        handleLetterInput={handleLetterInput}
+        onKeyboardCheckLetters={{}} 
       />
     )
 
     const buttons = screen.getAllByRole('button')
-    for(const btn of buttons) {        
-       expect(btn).toBeDisabled()
+    for (const btn of buttons) {
+      expect(btn).toBeDisabled()      
+      userEvent.click(btn);
     }
+  
+    expect(handleBackspace).not.toHaveBeenCalled();
+    expect(handleSubmitWord).not.toHaveBeenCalled();
+    expect(handleLetterInput).not.toHaveBeenCalled();
   })
 
 });

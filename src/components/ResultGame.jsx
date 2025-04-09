@@ -1,12 +1,16 @@
 
-export const ResultGame = ({ isGameStop, isWin, targetWord, resetGame }) => {
-  if (!isGameStop) {
+export const ResultGame = ({
+  result,
+  targetWord,
+  resetGame,
+ }) => {
+  if (result === "play") {
     return null;
   }
 
   return (
     <div>
-      {isWin ? (
+      {result === "win" ? (
         <h2>You Winner!🎉🎉🎉🎉</h2>
       ) : (
         <>

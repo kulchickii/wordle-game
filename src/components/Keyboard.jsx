@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import styles from './Keyboard.module.css'
 
-// const LETTERS = 'qwertyuiopasdfghjklzxcvbnm'
-
 const ROWS = [
   'qwertyuiop',
   'asdfghjkl',
@@ -34,17 +32,19 @@ export const Keyboard = ({ handleBackspace, handleSubmitWord, handleLetterInput,
         <div key={rowIndex} className={styles.row}>
           {rowIndex === 2 && 
             <button
+              data-testid = 'el-enter'
               disabled={disabled}
               onClick={handleSubmitWord}
               className={`${styles.key} ${styles.enter}`}
             >
-              enter
+              enter↵
             </button>
           }
           {row.split('').map((letter) => {
             const check = Object.hasOwn(onKeyboardCheckLetters, letter);
             return (
               <button
+                data-testid = {`el-${letter}`}
                 disabled={disabled}
                 key={letter}
                 onClick={() => handleLetterInput(letter)}
@@ -56,11 +56,12 @@ export const Keyboard = ({ handleBackspace, handleSubmitWord, handleLetterInput,
           })}
           {rowIndex === 2 && 
             <button
+              data-testid = 'el-backspace'
               disabled={disabled}
               onClick={handleBackspace}
               className={`${styles.key} ${styles.backspace}`}
             >
-            back
+            ⌫
             </button>
           }
         </div>

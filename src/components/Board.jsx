@@ -22,12 +22,3 @@ export const Board = ({enteredWords, currentWord, targetWord, isShowAlert}) => {
   </div>
 }
 
-/* 
-
-
-present (есть такая буква)
-absent (нет такой буквы)
-correct (буква на том месте) 
-
-
-*/
